@@ -6,7 +6,7 @@ import org.springframework.context.annotation.PropertySource;
 
 @SpringBootApplication
 
-//@PropertySource(value = "file:C:\\SwipeTech\\Projects\\DEMOS\\PROPERTIES\\application.properties", ignoreResourceNotFound = true)
+@PropertySource(value = "file:C:\\SwipeTech\\Projects\\DEMOS\\PROPERTIES\\application.properties", ignoreResourceNotFound = true)
 @PropertySource(value = "file:C:\\SwipeTech\\Projects\\DEMOS\\PROPERTIES\\swagger.properties", ignoreResourceNotFound = true)
 public class EmployeeCrudAppApplication {
 
