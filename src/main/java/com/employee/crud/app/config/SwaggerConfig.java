@@ -19,8 +19,10 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 import java.util.Collections;
 import java.util.List;
 
-import static com.google.common.collect.Lists.newArrayList;
+import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 
+//import static com.google.common.collect.Lists.*;
+//import static com.google.common.collect.Lists.newArrayList;
 
 @Configuration
 @EnableSwagger2
@@ -31,37 +33,42 @@ public class SwaggerConfig {
     @Value("${API.TOKEN_URL}")
     private String TOKEN_URL;
 
+    private boolean enableSwagger = true;
 
     @Bean
     public Docket api() {
-
         List<ResponseMessage> list = new java.util.ArrayList<>();
-        return new Docket(DocumentationType.SWAGGER_2).select()
+        return new Docket(DocumentationType.SWAGGER_2)
+                .enable(enableSwagger)
+                .select()
                 .apis(RequestHandlerSelectors.basePackage("com.employee.crud.app.controller"))
-                .paths(PathSelectors.any()).build().securitySchemes(Collections.singletonList(securitySchema()))
-                .securityContexts(Collections.singletonList(securityContext())).pathMapping("/")
-                .useDefaultResponseMessages(false).apiInfo(apiInfo()).globalResponseMessage(RequestMethod.GET, list)
+                .paths(PathSelectors.any())
+                .build()
+                .securitySchemes(Collections.singletonList(securitySchema()))
+                .securityContexts(Collections.singletonList(securityContext()))
+                .pathMapping("/")
+                .useDefaultResponseMessages(false)
+                .apiInfo(apiInfo())
+                .globalResponseMessage(RequestMethod.GET, list)
                 .globalResponseMessage(RequestMethod.POST, list);
-
     }
 
     private OAuth securitySchema() {
-
         List<AuthorizationScope> authorizationScopeList = newArrayList();
         authorizationScopeList.add(new AuthorizationScope("read", "read all"));
         authorizationScopeList.add(new AuthorizationScope("trust", "trust all"));
         authorizationScopeList.add(new AuthorizationScope("write", "access all"));
-
         List<GrantType> grantTypes = newArrayList();
         GrantType creGrant = new ResourceOwnerPasswordCredentialsGrant(CLIENT_URL + TOKEN_URL);
         grantTypes.add(creGrant);
 
-        return new OAuth("employee-rest-api", authorizationScopeList, grantTypes);
+        return new OAuth("swipe-rest-api", authorizationScopeList, grantTypes);
 
     }
 
     private SecurityContext securityContext() {
-        return SecurityContext.builder().securityReferences(defaultAuth())
+        return SecurityContext.builder()
+                .securityReferences(defaultAuth())
                 .forPaths(PathSelectors.any())
                 .build();
     }
@@ -76,19 +83,23 @@ public class SwaggerConfig {
         return Collections.singletonList(new SecurityReference("oauth2schema", authorizationScopes));
     }
 
-
     @Bean
     public SecurityConfiguration securityInfo() {
 
-        return new SecurityConfiguration("Utils.CLIENT_ID", "Utils.CLIENT_SECRET",
+        return new SecurityConfiguration("employee-client", "employee-secret",
                 "", "", "", ApiKeyVehicle.HEADER, "", " ");
     }
 
     private ApiInfo apiInfo() {
-        return new ApiInfoBuilder().title("Employee CRUD api for performing CRUD operations on employee records").description("")
+        return new ApiInfoBuilder()
+                .title("Employee CRUD api for performing CRUD operations on employee records").
+                description("")
                 .termsOfServiceUrl("https://employee.org")
                 .contact(new Contact("Employee CRUD App", "https://https://employee.org", "omameazy@gmail.com"))
-                .license("Open Source").licenseUrl("https://https://employee.org").version("1.0.0").build();
+                .license("Open Source")
+                .licenseUrl("https://https://employee.org")
+                .version("1.0.0")
+                .build();
     }
 
 }
